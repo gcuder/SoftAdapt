@@ -8,23 +8,41 @@ This repository contains an updated implementation of the [SoftAdapt algorithm](
 https://doi.org/10.48550/arXiv.1912.12355)
 
 ## Installing SoftAdapt
-### Installing the GitHub Repository (Recommended)
-SoftAdapt can be installed using PyPI:
-```
-$ pip install git+https://github.com/dr-aheydari/SoftAdapt.git
-```
-or can be first cloned and then installed as the following:
-```
-$ git clone https://github.com/dr-aheydari/SoftAdapt.git
-$ pip install ./SoftAdapt
+
+### Using Poetry (Recommended)
+SoftAdapt now uses [Poetry](https://python-poetry.org/) for dependency management. To install SoftAdapt with Poetry:
+
+1. First, make sure you have Poetry installed:
+```bash
+curl -sSL https://install.python-poetry.org | python3 -
 ```
 
-### Install Package Locally with `pip`
-Once the files are available, make sure to be in the same directory as `setup.py`. Then, using `pip`, run:
+2. Then, you can install SoftAdapt directly from GitHub:
+```bash
+poetry add git+https://github.com/dr-aheydari/SoftAdapt.git
+```
 
-````bash
-pip install -e .
-````
+3. Or clone the repository and install locally:
+```bash
+git clone https://github.com/dr-aheydari/SoftAdapt.git
+cd SoftAdapt
+poetry install
+```
+
+### Using pip (Alternative)
+If you prefer using pip, you can still install SoftAdapt:
+
+```bash
+pip install git+https://github.com/dr-aheydari/SoftAdapt.git
+```
+
+or clone and install:
+
+```bash
+git clone https://github.com/dr-aheydari/SoftAdapt.git
+cd SoftAdapt
+pip install .
+```
 
 ## General Usage and Examples
 
@@ -160,7 +178,7 @@ for current_epoch in range(training_epochs):
       values_of_component_1.append(loss_component_1(outputs))
       values_of_component_2.append(loss_component_2(outputs))
       values_of_component_3.append(loss_component_3(outputs))
-      
+
       # Change 4: Make sure `epochs_to_make_change` have passed before calling SoftAdapt.
       if current_epoch % epochs_to_make_updates == 0 and current_epoch != 0:
           adapt_weights = softadapt_object.get_component_weights(torch.tensor(values_of_component_1), 
@@ -168,16 +186,16 @@ for current_epoch in range(training_epochs):
                                                                  torch.tensor(values_of_component_3),
                                                                  verbose=False,
                                                                  )
-                                                            
-      
+
+
           # Resetting the lists to start fresh (this part is optional)
           values_of_component_1 = []
           values_of_component_2 = []
           values_of_component_3 = []
-      
+
       # Change 5: Update the loss function with the linear combination of all components.
       loss = adapt_weights[0] * loss_component_1(outputs) + adapt_weights[1]*loss_component_2(outputs) + adapt_weights[2]*loss_component_3(outputs)
-      
+
       loss.backward()
       optimizer.step()
 
@@ -260,5 +278,3 @@ If you found our work useful for your research, please cite us as:
   bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 ```
-
-

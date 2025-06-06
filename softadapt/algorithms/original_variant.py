@@ -1,8 +1,8 @@
 """Implementaion of the original variant of SoftAdapt."""
 
-import torch
+import numpy as np
 from ..base._softadapt_base_class import SoftAdaptBase
-from typing import Tuple
+from typing import Tuple, Union, List
 
 
 class SoftAdapt(SoftAdaptBase):
@@ -32,7 +32,7 @@ class SoftAdapt(SoftAdaptBase):
         self.accuracy_order = accuracy_order
 
     def get_component_weights(self,
-                               *loss_component_values: Tuple[torch.tensor],
+                               *loss_component_values: Tuple[Union[np.ndarray, List]],
                                verbose: bool = True):
         """Class method for SoftAdapt weights.
 
@@ -46,7 +46,7 @@ class SoftAdapt(SoftAdaptBase):
         Returns:
             The computed weights for each loss components. For example, if there
             were 5 loss components, say (l_1, l_2, l_3, l_4, l_5), then the
-            return tensor will be the weights (alpha_1, alpha_2, alpha_3,
+            return numpy array will be the weights (alpha_1, alpha_2, alpha_3,
             alpha_4, alpha_5) in the order of the loss components.
 
         Raises:
@@ -60,12 +60,16 @@ class SoftAdapt(SoftAdaptBase):
         rates_of_change = []
 
         for loss_points in loss_component_values:
+            # Convert to numpy array if not already
+            if not isinstance(loss_points, np.ndarray):
+                loss_points = np.array(loss_points)
+
             # Compute the rates of change for each one of the loss components.
             rates_of_change.append(
                 self._compute_rates_of_change(loss_points,
                                               self.accuracy_order,
                                               verbose=verbose))
 
-        rates_of_change = torch.tensor(rates_of_change)
+        rates_of_change = np.array(rates_of_change)
         # Calculate the weight and return the values.
         return self._softmax(input_tensor=rates_of_change, beta=self.beta)
