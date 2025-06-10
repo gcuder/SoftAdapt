@@ -2,7 +2,7 @@
 packages = [{include = "softadapt"}]
 
 [project]
-name = "softadapt_numpy"
+name = "softadapt"
 version = "0.0.5"
 description = "SoftAdapt: Techniques for Adaptive Loss Weighting of Neural Networks with Multi-Part Loss Functions"
 authors = [
